@@ -9,7 +9,7 @@ import { Btn } from './Button/Button';
 import { FcCancel } from 'react-icons/fc';
 import { useState } from 'react';
 
-export const App = ({ currentSearch }) => {
+export const App = () => {
   const [inputSearch, setInputSearch] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [images, setImages] = useState([]);
@@ -20,16 +20,12 @@ export const App = ({ currentSearch }) => {
   const [showBtnLoadMore, setShowBtnLoadMore] = useState('');
 
   useEffect(() => {
-    if (currentSearch) {
-      console.log(`(currentSearch === inputSearch`);
-      alert('!!!!!!!!!!!!!!');
-    }
     if (
       // (prevInputSearch => prevInputSearch !== inputSearch) ||
       // (prevPage => prevPage !== page)
       inputSearch
     ) {
-      setIsLoading(!isLoading);
+      setIsLoading(true);
 
       fetchImages(inputSearch, page)
         .then(({ images, totalHits }) => {
