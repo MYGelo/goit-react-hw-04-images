@@ -1,128 +1,147 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import { Searchbar } from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
-
 import { fetchImages } from 'components/Api/Api';
 import { Loader } from './Loader/Loader';
 import { Modal } from './Modal/Modal';
 import { Btn } from './Button/Button';
 
 import { FcCancel } from 'react-icons/fc';
+import { useState } from 'react';
 
-export class App extends Component {
-  state = {
-    inputSearch: '',
-    error: null,
-    isLoading: false,
-    images: [],
-    page: 1,
-    showModal: false,
-    imgSrc: '',
-    imgAlt: '',
-    showBtnLoadMore: '',
-  };
+export const App = ({ currentSearch }) => {
+  const [inputSearch, setInputSearch] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [images, setImages] = useState([]);
+  const [page, setPage] = useState(1);
+  const [showModal, setShowModal] = useState(false);
+  const [imgSrc, setImgSrc] = useState('');
+  const [imgAlt, setImgAlt] = useState('');
+  const [showBtnLoadMore, setShowBtnLoadMore] = useState('');
 
-  async componentDidUpdate(prevProps, prevState) {
+  useEffect(() => {
+    if (currentSearch) {
+      console.log(`(currentSearch === inputSearch`);
+      alert('!!!!!!!!!!!!!!');
+    }
     if (
-      prevState.inputSearch !== this.state.inputSearch ||
-      prevState.page !== this.state.page
+      // (prevInputSearch => prevInputSearch !== inputSearch) ||
+      // (prevPage => prevPage !== page)
+      inputSearch
     ) {
-      this.setState(({ isLoading }) => ({
-        isLoading: !isLoading,
-      }));
-      fetchImages(this.state.inputSearch, this.state.page)
+      setIsLoading(!isLoading);
+
+      fetchImages(inputSearch, page)
         .then(({ images, totalHits }) => {
-          this.setState(prevState => ({
-            images: [...prevState.images, ...images],
-            isLoading: false,
-            showBtnLoadMore: this.state.page < Math.ceil(totalHits / 12),
-          }));
+          setImages(prevImages => [...prevImages, ...images]);
+          setIsLoading(false);
+          setShowBtnLoadMore(page < Math.ceil(totalHits / 12));
         })
         .catch(error => this.setState({ error }));
     }
-  }
+  }, [inputSearch, page]);
 
-  onClickMore = () => {
-    this.setState(prevState => {
-      return { page: prevState.page + 1 };
-    });
+  const onClickMore = () => {
+    setPage(prevPage => prevPage + 1);
   };
 
-  handleSearchSubmit = currentSearch => {
-    this.setState({ inputSearch: currentSearch, images: [], page: 1 });
+  const handleSearchSubmit = currentSearch => {
+    console.log(currentSearch);
+    setInputSearch(currentSearch);
+    setImages([]);
+    setPage(1);
   };
 
-  onOpenModal = e => {
-    this.setState({
-      showModal: true,
-      imgSrc: e.target.name,
-      // imgAlt: e.target.alt,
-    });
+  const onOpenModal = e => {
+    setShowModal(true);
+    setImgSrc(e.target.name);
+    setImgAlt(e.target.alt);
+  };
+  const onCloseModal = e => {
+    setShowModal(false);
   };
 
-  onCloseModal = e => {
-    this.setState({
-      showModal: false,
-    });
-  };
+  return (
+    <>
+      <div
+        style={{
+          height: '100vh',
+          fontSize: 40,
+          color: '#010101',
+        }}
+      >
+        <Searchbar onSubmit={handleSearchSubmit} />
 
-  render() {
-    const { images, isLoading, showModal, imgSrc, imgAlt, showBtnLoadMore } =
-      this.state;
+        {isLoading ? (
+          <Loader />
+        ) : (
+          <React.Fragment>
+            <ImageGallery
+              images={images}
+              showModal={showModal}
+              onClick={onOpenModal}
+            />
+            {showBtnLoadMore ? <Btn onClick={onClickMore} /> : null}
+          </React.Fragment>
+        )}
+        {showModal ? (
+          <Modal onCloseModal={onCloseModal} showModal={showModal}>
+            <button
+              showModal={showModal}
+              style={{
+                position: 'relative',
+                left: '100%',
 
-    return (
-      <>
-        <div
-          style={{
-            height: '100vh',
-            fontSize: 40,
-            color: '#010101',
-          }}
-        >
-          <Searchbar onSubmit={this.handleSearchSubmit} />
+                background: 'transparent',
+                border: 'transparent',
+              }}
+              type="button"
+              onClick={onCloseModal}
+            >
+              <FcCancel />
+            </button>
+            <img
+              style={{
+                display: 'flex',
+                position: 'relative',
+                width: '100%',
+                top: '-10px',
+              }}
+              src={imgSrc}
+              alt={imgAlt}
+            ></img>
+          </Modal>
+        ) : null}
+      </div>
+    </>
+  );
+};
 
-          {isLoading ? (
-            <Loader />
-          ) : (
-            <React.Fragment>
-              <ImageGallery
-                images={images}
-                showModal={showModal}
-                onClick={this.onOpenModal}
-              />
-              {showBtnLoadMore ? <Btn onClick={this.onClickMore} /> : null}
-            </React.Fragment>
-          )}
+// {showModal ? (
+//   <Modal onCloseModal={onCloseModal} showModal={showModal}>
+//     <button
+//       showModal={showModal}
+//       style={{
+//         position: 'relative',
+//         left: '100%',
 
-          {showModal ? (
-            <Modal onCloseModal={this.onCloseModal}>
-              <button
-                style={{
-                  position: 'relative',
-                  left: '100%',
-
-                  background: 'transparent',
-                  border: 'transparent',
-                }}
-                type="button"
-                onClick={this.onCloseModal}
-              >
-                <FcCancel />
-              </button>
-              <img
-                style={{
-                  display: 'flex',
-                  position: 'relative',
-                  width: '100%',
-                  top: '-10px',
-                }}
-                src={imgSrc}
-                alt={imgAlt}
-              ></img>
-            </Modal>
-          ) : null}
-        </div>
-      </>
-    );
-  }
-}
+//         background: 'transparent',
+//         border: 'transparent',
+//       }}
+//       type="button"
+//       onClick={onCloseModal}
+//     >
+//       <FcCancel />
+//     </button>
+//     <img
+//       style={{
+//         display: 'flex',
+//         position: 'relative',
+//         width: '100%',
+//         top: '-10px',
+//       }}
+//       src={imgSrc}
+//       alt={imgAlt}
+//     ></img>
+//   </Modal>
+// ) : null}
