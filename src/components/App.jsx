@@ -20,11 +20,7 @@ export const App = () => {
   const [showBtnLoadMore, setShowBtnLoadMore] = useState('');
 
   useEffect(() => {
-    if (
-      // (prevInputSearch => prevInputSearch !== inputSearch) ||
-      // (prevPage => prevPage !== page)
-      inputSearch
-    ) {
+    if (inputSearch) {
       setIsLoading(true);
 
       fetchImages(inputSearch, page)
