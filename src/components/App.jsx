@@ -108,32 +108,3 @@ export const App = () => {
     </>
   );
 };
-
-// {showModal ? (
-//   <Modal onCloseModal={onCloseModal} showModal={showModal}>
-//     <button
-//       showModal={showModal}
-//       style={{
-//         position: 'relative',
-//         left: '100%',
-
-//         background: 'transparent',
-//         border: 'transparent',
-//       }}
-//       type="button"
-//       onClick={onCloseModal}
-//     >
-//       <FcCancel />
-//     </button>
-//     <img
-//       style={{
-//         display: 'flex',
-//         position: 'relative',
-//         width: '100%',
-//         top: '-10px',
-//       }}
-//       src={imgSrc}
-//       alt={imgAlt}
-//     ></img>
-//   </Modal>
-// ) : null}
