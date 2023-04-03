@@ -14,7 +14,7 @@ export const Modal = ({ onCloseModal, children }) => {
     };
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  });
+  }, [onCloseModal]);
 
   const handleBackdrop = e => {
     if (e.currentTarget === e.target) {
